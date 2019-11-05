@@ -26,7 +26,25 @@ glm::vec3 surf(int i, int j)
 
    return 0.05f*glm::vec3(x, y, z);
 }
-
+std::vector<int> indices() {
+	std::vector<int> indices(N * N * 3 - N);
+	int n = 0;
+	for (int i = 0; i < N - 1; i++)
+		for (int j = 0; j < N; j++) {
+			int index = i * N + j;
+			if (index % 2 == 0) {
+				indices[n] = index;
+				indices[++n] = index + 1;
+				indices[++n] = index + N;
+			}
+			else {
+				indices[n] = index;
+				indices[++n] = index + N - 1;
+				indices[++n] = index + N;
+			}		
+		}
+	return indices;
+}
 //The demo shape being currently draw.
 glm::vec3 circle(int i)
 {
@@ -55,7 +73,17 @@ GLuint create_surf_vbo()
 
    return vbo;
 }
+GLuint create_surf_ebo() {
+	std::vector<int> Indices = indices();
 
+	GLuint ebo;
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * Indices.size(), Indices.data(), GL_STATIC_DRAW);
+	
+	return ebo;
+}
 GLuint create_surf_vao()
 {
    GLuint vao;
@@ -67,6 +95,7 @@ GLuint create_surf_vao()
    glBindVertexArray(vao);
 
    GLuint vbo = create_surf_vbo();
+   GLuint ebo = create_surf_ebo();
 
    const GLint pos_loc = 0; //See also InitShader.cpp line 164.
 
@@ -81,5 +110,6 @@ GLuint create_surf_vao()
 
 void draw_surf(GLuint vao, GLenum mode)
 {
-   glDrawArrays(mode, 0, N * N);
+    //glDrawArrays(mode, 0, N * N);
+	glDrawElements(mode, N * N * 3 - N, GL_UNSIGNED_INT, 0);
 }
