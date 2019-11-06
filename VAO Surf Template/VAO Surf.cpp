@@ -169,10 +169,8 @@ void draw_surf(const glm::mat4& P, const glm::mat4& V)
 // This function gets called every time the scene gets redisplayed 
 void display()
 {
-	if (changeDrawMode)
-		glPolygonMode(GL_FRONT, GL_LINE);
-	else
-		glPolygonMode(GL_FRONT, GL_POINT);
+	
+
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear the back buffer
    
    glm::mat4 V = glm::lookAt(campos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f))*glm::rotate(camangle, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -184,9 +182,12 @@ void display()
    {
       draw_fish(P, V);
    }
-
+   if (changeDrawMode)
+	   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   else
+	   glPolygonMode(GL_FRONT, GL_POINT);
    draw_surf(P, V);
-
+   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
    draw_gui();
    glutSwapBuffers();
    
